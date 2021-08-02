@@ -4,8 +4,9 @@ import thunk from 'redux-thunk';
 import '@testing-library/jest-dom';
 import Swal from 'sweetalert2';
 
-import { startLogin } from '../../actions/auth';
+import { startLogin, startRegister } from '../../actions/auth';
 import { types } from '../../types/types';
+import * as fetchModule from '../../helpers/fetch'
 
 const middlewares = [ thunk ];
 const mockStore = configureStore( middlewares );
@@ -54,8 +55,38 @@ describe('Test on Auth', () => {
         expect( actions ).toEqual([])
 
         expect( Swal.fire ).toHaveBeenCalled()
+    });
+
+
+    test('startRegister should work', async() => {
+
+        fetchModule.fetchWithoutToken = jest.fn( () => ({
+            json() {
+                return {
+                    ok: true,
+                    uid: '123',
+                    name: 'david',
+                    token: 'ABC'
+                }
+            }
+
+        }));
+
+        await store.dispatch( startRegister('test@test.com', '123456', 'test') );
+
+        const actions = store.getActions();
+
+        expect( actions[0] ).toEqual({
+            type: types.authLogin,
+            payload: {
+                uid: '123',
+                name: 'david'
+            }
+        })
+
     })
     
+     
     
     
 });
