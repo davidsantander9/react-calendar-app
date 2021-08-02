@@ -2,6 +2,8 @@
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import '@testing-library/jest-dom';
+import Swal from 'sweetalert2';
+
 import { startLogin } from '../../actions/auth';
 import { types } from '../../types/types';
 
@@ -13,6 +15,10 @@ const initState = {};
 let store = mockStore( initState );
 
 Storage.prototype.setItem = jest.fn()
+
+jest.mock('sweetalert2', ()=> ({
+    fire: jest.fn()
+}))
 
 
 describe('Test on Auth', () => {
@@ -38,7 +44,18 @@ describe('Test on Auth', () => {
 
         expect( localStorage.setItem ).toHaveBeenCalled()
 
+    });
+
+    test('startLogin should work incorrectly', async() => {
+        await store.dispatch( startLogin('david@gmail.com', 'abc1123') );
+
+        const actions = store.getActions();
+
+        expect( actions ).toEqual([])
+
+        expect( Swal.fire ).toHaveBeenCalled()
     })
+    
     
     
 });
