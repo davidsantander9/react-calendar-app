@@ -8,12 +8,18 @@ import '@testing-library/jest-dom';
 import moment from 'moment';
 import { CalendarModal } from '../../../components/calendar/CalendarModal';
 import { eventClearActiveEvent, eventStartAddNew, eventStartUpdate } from '../../../actions/events';
+import { act } from '@testing-library/react';
+import Swal from 'sweetalert2';
 
 
 jest.mock('../../../actions/events', () => ({
     eventStartUpdate: jest.fn(),
     eventClearActiveEvent: jest.fn(),
     eventStartAddNew: jest.fn(),
+}))
+
+jest.mock('sweetalert2', () => ({
+    fire: jest.fn(),
 }))
 
 const middlewares = [ thunk ];
@@ -128,5 +134,32 @@ describe('test on <CalendarModal/>', () => {
         expect( eventClearActiveEvent ).toHaveBeenCalled();
 
     });    
+
+    test('should validate dates', () => {
+        
+        wrapper.find('input[name="title"]').simulate('change', { 
+            target:{
+                name: 'title',
+                value: 'Hello test'
+            }
+        });
+
+
+        const today = new Date();
+
+        act( () => {
+            wrapper.find('DateTimePicker').at(1).prop('onChange')(today)
+        });
+
+        wrapper.find('form').simulate('submit', {
+            preventDefault(){}
+        });
+
+        expect( Swal.fire ).toHaveBeenCalledWith(
+            "Error", "La fecha fin debe de ser mayor a la fecha de inicio", "error"
+        );
+
+    });
+    
 
 });
