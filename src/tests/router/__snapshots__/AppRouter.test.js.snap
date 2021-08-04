@@ -5,3 +5,9 @@ exports[`Test on <AppRouter/> should show wait 1`] = `
   Wait...
 </h5>
 `;
+
+exports[`Test on <AppRouter/> should show wait... 1`] = `
+<h5>
+  Wait...
+</h5>
+`;
