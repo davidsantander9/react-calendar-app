@@ -70,7 +70,7 @@ describe('Test on <AppRouter/>', () => {
             },
             ui:{
                 modalOpen: false
-            } ,
+            },
             auth: {
                 checking: false,
                 uid: '123',
