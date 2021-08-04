@@ -6,11 +6,16 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import '@testing-library/jest-dom';
 import { LoginScreen } from '../../../components/auth/LoginScreen';
-import { startLogin } from '../../../actions/auth';
-
+import { startLogin, startRegister } from '../../../actions/auth';
+import Swal from 'sweetalert2';
 
 jest.mock('../../../actions/auth', () => ({
-    startLogin: jest.fn()
+    startLogin: jest.fn(),
+    startRegister: jest.fn(),
+}))
+
+jest.mock('sweetalert2', () => ({
+    fire: jest.fn(),
 }))
 
 const middlewares = [ thunk ];
@@ -28,6 +33,10 @@ const wrapper = mount(
 )
 
 describe('test on <LoginScreen/>', () => {
+
+    beforeEach( () => {
+        jest.clearAllMocks() 
+    })
     
     test('should show correctly', () => {
         
@@ -57,8 +66,33 @@ describe('test on <LoginScreen/>', () => {
 
         expect( startLogin ).toHaveBeenCalledWith('david@gmail.com', 'abc123');
 
-
     });
+
+
+    test('should no register if passwords are diferent', () => {
+        wrapper.find('input[name="rPassword1"]').simulate('change', {
+            target:{
+                name: 'rPassword1',
+                value: '123456'
+            }
+        });
+
+        wrapper.find('input[name="rPassword2"]').simulate('change', {
+            target:{
+                name: 'rPassword2',
+                value: '123457'
+            }
+        });
+
+        wrapper.find('form').at(1).prop('onSubmit')({
+            preventDefault(){}
+        });
+
+        expect( startRegister ).not.toHaveBeenCalled();
+        expect( Swal.fire ).toHaveBeenCalled();
+
+    })
+    
     
     
 })
